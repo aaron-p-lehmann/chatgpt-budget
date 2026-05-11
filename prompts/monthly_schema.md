@@ -9,11 +9,10 @@ This is a description of the schema of a budgeting system that runs in ChatGPT.
 Schedule is a timing table only.
 It does not define amounts or actual payments.
 
-During migration, Schedule may temporarily contain financial columns copied from older source data. Those values may be used to populate the correct domain tables. Once migrated, the financial data should be removed or marked as migrated before the final schema is enforced.
 
 The types of the columns are:
 
-- Domain - the monthly domain table that the scheduled row references. Allowed values are Recurring Bills, Debt, Reserves, and Planned Spending.
+- Domain - the monthly domain table that the scheduled row references. Allowed values are Recurring Bills, Debt, Reserves, Planned Spending, and Income.
 - Item - the row identifier in the referenced domain table. Together with Domain, Item MUST correspond to exactly one row in the referenced monthly domain table.
 - Month - a Month value.
 - Day - a Day value.
@@ -27,6 +26,35 @@ Tables used to validate this section:
 - Planned Spending Table
 - Reserves Table
 - Debt Table
+- Income Table
+
+# INCOME
+
+\| Item | Expected | Actual | Transient | Notes |
+
+Income records positive cash inflows received or expected during the budget month.
+
+The types of the columns are:
+
+- Item - the row identifier. Item MUST be unique within Income.
+- Expected - a non-negative Money value, or UNKNOWN if the expected inflow is not known.
+- Actual - a non-negative Money value, or UNKNOWN if the actual received inflow is not known.
+- Transient - TRUE or FALSE. TRUE means the row is temporary.
+- Notes - a Freeform value. Notes are purely for human consumption, may be blank, should not use UNKNOWN, and MUST NOT include information that is already provided by another column.
+
+Notes:
+
+- Income is not a Reserve, Adjustment, Recurring Bill, Debt, or Planned Spending item.
+- Income rows record only the inflow.
+- A bonus, reimbursement, refund, gift, or other one-time inflow may be marked Transient = TRUE.
+- Recurring or durable income sources have Transient = FALSE.
+- Income rows MAY have matching Schedule rows when the inflow is expected on a date or paycheck cycle.
+- Income rows do not require a Schedule row.
+
+Tables used to validate this section:
+
+- Income Table
+- Schedule Table
 
 # RECURRING BILLS
 
@@ -52,8 +80,6 @@ Notes:
 - Individual subscriptions, such as Netflix or YouTube Family, may be Recurring Bills.
 - Subscription rows should use the individual subscription name as Item.
 - Variable recurring bills, such as Electricity, may be Recurring Bills.
-- The raw table currently shows positive values in Expected for many recurring bill rows. Under the sign convention, these should become negative once normalized.
-- During migration, Schedule may contain transitional financial data. That data may be used to populate Recurring Bills. After migration, Schedule MUST lose financial columns.
 
 Tables used to validate this section:
 
@@ -81,7 +107,6 @@ Notes:
 - Every Planned Spending row MUST reference a parent Reserves row using Reserve.
 - A Planned Spending row MAY have a matching Schedule row only when Recurring Bill is TRUE.
 - If a Planned Spending row has a matching Schedule row but Recurring Bill is not TRUE, the assistant MUST flag it as semantically invalid.
-- The raw table currently shows positive values in Expected for many planned spending rows. Under the sign convention, these should become negative once normalized.
 
 Tables used to validate this section:
 
@@ -106,16 +131,9 @@ The types of the columns are:
 Notes:
 
 - Money in reserves is still owned, not spent.
-- Allocation increases Balance.
-- Actual decreases Balance when money is used.
 - Cap may be a Money value, AS ALLOCATED, or UNCAPPED.
 - Only reserves with numeric caps or UNCAPPED caps carry balances month to month.
-- Reserves with Cap = AS ALLOCATED are funded to their Balance when funded, and Balance decreases as they are used.
-- Because the system has not started using these reserve balances yet, AS ALLOCATED reserve balances begin at 0.00 unless an actual balance is known.
 - Reserves may represent internally maintained earmarked buckets or externally maintained accounts.
-- Whether a reserve is internal or external should be explained in Notes when relevant.
-- Do not split internal reserves and external accounts into separate tables unless explicitly instructed.
-- The raw table currently uses Expected for reserve funding. Under the schema, those values should become Allocation once normalized.
 
 Tables used to validate this section:
 
@@ -139,9 +157,6 @@ Notes:
 - Adjustments are actual-only records.
 - Adjustments do not define expected spending, allocations, balances, caps, timing, or scheduled behavior.
 - Adjustments are not Reserves, Recurring Bills, Debt, or Planned Spending.
-- Taxes from receipts, including sales tax, excise tax, and VAT, should be recorded here unless explicitly assigned elsewhere.
-- Receipt-level fees, discounts, deposits, and rounding differences may be recorded here when they are not meaningfully part of another table.
-- Adjustments should not generally appear in Schedule.
 
 Tables used to validate this section:
 
@@ -165,9 +180,7 @@ Notes:
 
 - Debt balances are negative.
 - Minimum is a required payment.
-- Actual Paid reflects real payments only.
 - Each active Debt row MUST have exactly one matching Schedule row.
-- The raw table currently shows positive values in Expected for debt payments. Under the debt schema, those values should become negative Minimum values once normalized.
 
 Tables used to validate this section:
 
@@ -182,16 +195,19 @@ Tables used to validate this section:
 - Schedule entries MUST NOT have both payday timing and date timing. A Schedule row may use Month/Day timing, or Paycheck timing, or neither if timing is unknown, but it MUST NOT use both.
 - It is permissible for Month, Day, and Paycheck to all be UNKNOWN when the timing is not known.
 - A Schedule row MAY reference a Planned Spending row only when the Planned Spending row's Recurring Bill value is TRUE.
+- A Schedule row MAY reference an Income row when the inflow is expected on a date or paycheck cycle.
 - A Schedule row MUST NOT reference an Adjustments row unless explicitly allowed.
 - Each active Recurring Bills row MUST have exactly one matching Schedule row.
 - Each active Debt row MUST have exactly one matching Schedule row.
 - Each active Reserves row MUST have at least one matching Schedule row unless Paused is TRUE or the row is explicitly marked inactive or intentionally unfunded.
 - Planned Spending rows MAY have matching Schedule rows only when Recurring Bill is TRUE.
 - Adjustments rows MUST NOT have matching Schedule rows unless explicitly allowed.
+- Income rows MAY have matching Schedule rows when the inflow is scheduled, expected, or should be checked.
 - Recurring Bills rows MUST be atomic. Grouped categories such as Subscriptions MUST be split into their individual bills before becoming Recurring Bills.
 - Every Planned Spending row MUST reference exactly one Reserves row using Reserve.
 - If a Planned Spending row has a matching Schedule row but Recurring Bill is not TRUE, the row is semantically invalid.
 - Notes columns in any table are purely for human consumption, may be blank, should not use UNKNOWN, and MUST never include information that is provided by another column.
+- Transient is row-level metadata. It indicates that the row is temporary; it does not by itself determine how the money should be allocated.
 - A value that passes type validation can still fail semantic validation if it is in the wrong table, violates a required relationship, or contradicts the table’s purpose.
 
 # Glossary
@@ -204,6 +220,7 @@ Tables used to validate this section:
 - Day: The day of the month this expense is due, or UNKNOWN if the day is not known or the row uses Paycheck timing instead.
 - Paycheck: Identifies which paycheck cycle this item is associated with for interaction or funding, or UNKNOWN if the paycheck is not known or the row uses Month/Day timing instead.
 - Notes: Human-readable reference information only. Notes may be blank. A blank Notes cell means there is no human-reference note for that row. Notes should not use UNKNOWN. Notes MUST never duplicate or restate information that is provided by another column.
+- Transient: A TRUE/FALSE value indicating whether the row is temporary.
 - Allocation: Planned funding into a bucket (positive value, does not represent spending).
 - Cap: The maximum amount of money that can be earmarked for that item. "UNCAPPED" means there is no cap.
 - Balance: Money currently held in the bucket (positive) or owed (negative for debt).
