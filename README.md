@@ -17,7 +17,7 @@ prompt:
 Expand this tarball.
 
 Read initializer.md carefully from beginning to end.  Verify that its sha256 checksum is
-1348b8701d8590b82a4c617985dcd08ed10c960df094f9fdae411bbdce1e9ccc.  If the checksum does not match, report an error and
+cfefcef4c90110ead860146739219508dcf791f2092643cb1e913d95061786b6.  If the checksum does not match, report an error and
 do not load any files.
 
 Before executing its instructions, answer this verification question:

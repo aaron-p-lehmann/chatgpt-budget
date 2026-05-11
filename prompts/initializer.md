@@ -61,6 +61,7 @@ Infer the canvas name from the file name as follows:
 | adjustments_table.md | Adjustments Table |
 | command_design.md | Command Design |
 | debt_table.md | Debt Table |
+| income_table.md | Income Table |
 | migration_status.md | Migration Status |
 | monthly_schema.md | Monthly Schema |
 | monthly_system.md | Monthly System |
@@ -121,19 +122,20 @@ If all canvases are LOADED FROM VERIFIED SOURCE ONLY, the system may use them on
 | SHA-256 | File | Canvas name |
 |--------|------|-------------|
 | 06d66de31b7899470eaa7c10df440d3f7ebdcac27dfc761b2ebf65b4df626e3f | adjustments_table.md | Adjustments Table |
-| 2bfffe7a391d3937a13d41237209f130c6d84ae017d60bec975d873b0d66cc96 | command_design.md | Command Design |
-| 2b59dea76850e7ddf5213c4aec263adadff82830b4b0eced56509d93339e9309 | debt_table.md | Debt Table |
+| ceb7dc8433bae2139c05998b694ad56aef45a33d572cfdf498f6a1039535f40b | command_design.md | Command Design |
+| cf677cec72b6a2a6de4c0dc2616af819ec9361e73699991dc9d5b5acf6bd5dcd | debt_table.md | Debt Table |
+| 5dca339e006656dc64846bca40b77de141c43e5497c95c87559f45a1baf48df0 | income_table.md | Income Table |
 | 9444fee363ef91ec970a2843bcf46477e02f0d10f0aa36a4abe2930c28306f4f | migration_status.md | Migration Status |
-| a9fa347c335c1f9fd9b2f2e9745a32612370c040df1ff609e78657782c2c3096 | monthly_schema.md | Monthly Schema |
-| 1d033535b63c043f004b9f5d9063f9d7fa4f081d981b6ded66ec8573b3183414 | monthly_system.md | Monthly System |
+| 93b809006a3428c9290e6b8bf8cc510617e976ad5f6ba6c419e695cd493834f1 | monthly_schema.md | Monthly Schema |
+| 09b3fd40643f2554bb6c287af37352aec448bd40ff0c21e9548e445d6c166b19 | monthly_system.md | Monthly System |
 | 653b4d6571fbd70214fe64dd23779095e7f74536e909890dba0bec070ecb7cf6 | planned_spending_table.md | Planned Spending Table |
 | 6da9c15e47f7a7e451a61f4963de08804cff254f94f663d781491790b04c20a5 | recurring_bills_table.md | Recurring Bills Table |
 | 103b961b3e9b448c2e2b190066f822596d5532719dca7d270e8deb52f0d6d4d5 | reserves_table.md | Reserves Table |
-| 34e44434c2a301e746d883db2f318b9c1f208c93ed7b729ffb5848eb21fe13a3 | schedule_table.md | Schedule Table |
+| a313827c40ff1e1c1a2a37669db8a36b318b579e20aeb9f7e86a681951262aa4 | schedule_table.md | Schedule Table |
 | efafbbf4160dffa773828dfad65cc3c01534f29c3c7dd4afbb2b344b025d43f0 | setup_budget_cells.md | Setup Budget Cells |
 | ea067971d627f17f93fbf2cfbb8b0a3e71d3e1c5074ad81c2e705dd0bc329667 | setup_schema.md | Setup Schema |
 | d925fa394df71ed86979d7f2e0a705ba3d82769a9d58002ed06141f040b4f75c | setup_system.md | Setup System |
-| cb953158064049e82da77e0f8e28c0c3b515646af1b0a05b9c960d22675ddaf9 | system.md | System |
+| 8d007dc9f4c41f925f910f2ebca134286b7183b39341d390db79ff6b9874e39a | system.md | System |
 
 # Per-file loading procedure
 
@@ -201,6 +203,23 @@ What is the last debt item listed in debt_table.md?
 Expected answer type:
 
 Quote the item name exactly.
+
+## income_table.md
+
+Canvas name: Income Table
+
+Verification question:
+
+What are the column headers in income_table.md, and what is the Transient value for Regular paycheck?
+
+Expected answer type:
+
+List the headers exactly as they appear, then quote the Transient value exactly.
+
+Expected answer:
+
+- Headers: Item | Expected | Actual | Transient | Notes |
+- Transient value for Regular paycheck: FALSE
 
 ## migration_status.md
 
