@@ -16,9 +16,8 @@ prompt:
 ```
 Expand this tarball.
 
-Read initializer.md carefully from beginning to end.  Verify that its sha256 checksum is
-cfefcef4c90110ead860146739219508dcf791f2092643cb1e913d95061786b6.  If the checksum does not match, report an error and
-do not load any files.
+Read initializer.md carefully from beginning to end.  Verify that its sha256 checksum is .  If the checksum does not
+match, report an error and 0a917b404295e892e2dbd281fec410d6cc45235dcd06aeed2edd75583b41c6e3 do not load any files.
 
 Before executing its instructions, answer this verification question:
 What is the final file listed in the manifest, and what canvas name should be inferred from it?
