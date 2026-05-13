@@ -2,21 +2,25 @@
 
 This is a description of the schema of a budgeting system that runs in ChatGPT.
 
+# Data Types
+
+- Month: An integer from 1 through 12. For Schedule date resolution, if the Month value is the current calendar month or later, use the current calendar year. If the Month value is earlier than the current calendar month, use the next calendar year.
+- Day: An integer from 1 through the valid final day of the resolved Month and year. An entry with a known Day must always have a known Month.
+
 # SCHEDULE
 
-\| Domain | Item | Month | Day | Paycheck | Notes |
+\| Domain | Item | Month | Day | Payday | Notes |
 
 Schedule is a timing table only.
 It does not define amounts or actual payments.
-
 
 The types of the columns are:
 
 - Domain - the monthly domain table that the scheduled row references. Allowed values are Recurring Bills, Debt, Reserves, Planned Spending, and Income.
 - Item - the row identifier in the referenced domain table. Together with Domain, Item MUST correspond to exactly one row in the referenced monthly domain table.
-- Month - a Month value.
-- Day - a Day value.
-- Paycheck - a Paycheck value.
+- Month - a Month value, FALSE, or UNKNOWN. FALSE means the row deliberately does not use Month because it uses Payday = TRUE. UNKNOWN means the month is not known.
+- Day - a Day value, FALSE, or UNKNOWN. FALSE means the row deliberately does not use Day because it uses Payday = TRUE. UNKNOWN means the day is not known.
+- Payday - TRUE, FALSE, or UNKNOWN. TRUE means the Schedule row is triggered by each payday event. FALSE means the Schedule row is not triggered by payday events. UNKNOWN means payday-event triggering is not known.
 - Notes - a Freeform value. Notes are purely for human consumption, may be blank, should not use UNKNOWN, and MUST NOT include information that is already provided by another column.
 
 Tables used to validate this section:
@@ -48,7 +52,7 @@ Notes:
 - Income rows record only the inflow.
 - A bonus, reimbursement, refund, gift, or other one-time inflow may be marked Transient = TRUE.
 - Recurring or durable income sources have Transient = FALSE.
-- Income rows MAY have matching Schedule rows when the inflow is expected on a date or paycheck cycle.
+- Income rows MAY have matching Schedule rows when the inflow is expected on a date or payday event.
 - Income rows do not require a Schedule row.
 
 Tables used to validate this section:
@@ -72,7 +76,6 @@ The types of the columns are:
 
 Notes:
 
-- Recurring Bills intentionally has no Month, Day, or Paycheck fields.
 - Timing for Recurring Bills belongs in Schedule.
 - Each active Recurring Bills row MUST have exactly one matching Schedule row.
 - Grouped categories are not Recurring Bills if they are not atomic.
@@ -101,7 +104,6 @@ The types of the columns are:
 
 Notes:
 
-- Planned Spending intentionally has no Month, Day, or Paycheck fields.
 - Planned Spending describes expected use patterns or detailed spending categories for a referenced reserve bucket.
 - Planned Spending does not itself hold money or carry a balance.
 - Every Planned Spending row MUST reference a parent Reserves row using Reserve.
@@ -189,13 +191,20 @@ Tables used to validate this section:
 
 # SEMANTIC VALIDATION RULES
 
+- The monthly domain tables are Income, Recurring Bills, Debt, Reserves, Planned Spending, and Adjustments.
+- Schedule Table is a monthly timing table that may reference Income, Recurring Bills, Debt, Reserves, and Planned Spending.
 - Schedule is a timing table only and MUST NOT contain amount, actual payment, balance, cap, or interest columns.
 - Every Schedule row MUST reference exactly one row in exactly one monthly domain table using Domain + Item.
 - Domain + Item does not need to be unique inside Schedule unless the referenced domain table requires a 1:1 relationship.
-- Schedule entries MUST NOT have both payday timing and date timing. A Schedule row may use Month/Day timing, or Paycheck timing, or neither if timing is unknown, but it MUST NOT use both.
-- It is permissible for Month, Day, and Paycheck to all be UNKNOWN when the timing is not known.
+- A single domain row MAY have multiple Schedule rows unless that domain table requires a 1:1 relationship.
+- Schedule entries MUST NOT have both payday timing and date timing. A Schedule row may use Month/Day timing, Payday = TRUE, or neither if timing is unknown, but it MUST NOT use both date timing and Payday = TRUE. A row with Payday = TRUE MUST have Month = FALSE and Day = FALSE.
+- It is permissible for Month, Day, and Payday to all be UNKNOWN when the timing is not known.
+- If Month = FALSE or Day = FALSE, that field is deliberately not used for date timing.
+- A row with Month = FALSE or Day = FALSE MUST use Payday = TRUE unless explicitly allowed by a future schema rule.
+- If Payday = FALSE, the row is not payday-triggered.
+- If Payday = UNKNOWN, the row’s payday-trigger behavior is unknown.
 - A Schedule row MAY reference a Planned Spending row only when the Planned Spending row's Recurring Bill value is TRUE.
-- A Schedule row MAY reference an Income row when the inflow is expected on a date or paycheck cycle.
+- A Schedule row MAY reference an Income row when the inflow is expected on a date or payday event.
 - A Schedule row MUST NOT reference an Adjustments row unless explicitly allowed.
 - Each active Recurring Bills row MUST have exactly one matching Schedule row.
 - Each active Debt row MUST have exactly one matching Schedule row.
@@ -203,11 +212,16 @@ Tables used to validate this section:
 - Planned Spending rows MAY have matching Schedule rows only when Recurring Bill is TRUE.
 - Adjustments rows MUST NOT have matching Schedule rows unless explicitly allowed.
 - Income rows MAY have matching Schedule rows when the inflow is scheduled, expected, or should be checked.
+- Income rows do not require matching Schedule rows.
+- Recurring or durable Income rows MUST have Transient = FALSE.
 - Recurring Bills rows MUST be atomic. Grouped categories such as Subscriptions MUST be split into their individual bills before becoming Recurring Bills.
+- Individual subscriptions, such as Netflix or YouTube Family, MAY be Recurring Bills.
 - Every Planned Spending row MUST reference exactly one Reserves row using Reserve.
 - If a Planned Spending row has a matching Schedule row but Recurring Bill is not TRUE, the row is semantically invalid.
 - Notes columns in any table are purely for human consumption, may be blank, should not use UNKNOWN, and MUST never include information that is provided by another column.
 - Transient is row-level metadata. It indicates that the row is temporary; it does not by itself determine how the money should be allocated.
+- Income, Recurring Bills, Debt, Reserves, Planned Spending, and Adjustments do not define timing fields. Timing belongs in Schedule unless explicitly required by a future schema change.
+- Adjustments do not define expected spending, allocations, balances, caps, timing, or scheduled behavior.
 - A value that passes type validation can still fail semantic validation if it is in the wrong table, violates a required relationship, or contradicts the table’s purpose.
 
 # Glossary
@@ -216,9 +230,6 @@ Tables used to validate this section:
 - Expected: Planned recurring outflow for the month (negative value).
 - Actual: Real transaction amount (negative for spending, positive for inflow).
 - Reserve: The Item value of the Reserves row that funds a Planned Spending row.
-- Month: The month this expense is due, or UNKNOWN if the month is not known or the row uses Paycheck timing instead.
-- Day: The day of the month this expense is due, or UNKNOWN if the day is not known or the row uses Paycheck timing instead.
-- Paycheck: Identifies which paycheck cycle this item is associated with for interaction or funding, or UNKNOWN if the paycheck is not known or the row uses Month/Day timing instead.
 - Notes: Human-readable reference information only. Notes may be blank. A blank Notes cell means there is no human-reference note for that row. Notes should not use UNKNOWN. Notes MUST never duplicate or restate information that is provided by another column.
 - Transient: A TRUE/FALSE value indicating whether the row is temporary.
 - Allocation: Planned funding into a bucket (positive value, does not represent spending).

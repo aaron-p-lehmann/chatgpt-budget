@@ -67,6 +67,7 @@ Infer the canvas name from the file name as follows:
 | monthly_system.md | Monthly System |
 | planned_spending_table.md | Planned Spending Table |
 | recurring_bills_table.md | Recurring Bills Table |
+| receipt_code_glossary.md | Receipt Code Glossary |
 | reserves_table.md | Reserves Table |
 | schedule_table.md | Schedule Table |
 | setup_budget_cells.md | Setup Budget Cells |
@@ -121,21 +122,22 @@ If all canvases are LOADED FROM VERIFIED SOURCE ONLY, the system may use them on
 
 | SHA-256 | File | Canvas name |
 |--------|------|-------------|
-| 06d66de31b7899470eaa7c10df440d3f7ebdcac27dfc761b2ebf65b4df626e3f | adjustments_table.md | Adjustments Table |
+| 91eb446ebcfb0abd8a1146a925b2c7ac721801614fd0ee9a428e521bde7ef8b0 | adjustments_table.md | Adjustments Table |
 | ceb7dc8433bae2139c05998b694ad56aef45a33d572cfdf498f6a1039535f40b | command_design.md | Command Design |
 | cf677cec72b6a2a6de4c0dc2616af819ec9361e73699991dc9d5b5acf6bd5dcd | debt_table.md | Debt Table |
 | 5dca339e006656dc64846bca40b77de141c43e5497c95c87559f45a1baf48df0 | income_table.md | Income Table |
-| 9444fee363ef91ec970a2843bcf46477e02f0d10f0aa36a4abe2930c28306f4f | migration_status.md | Migration Status |
-| 93b809006a3428c9290e6b8bf8cc510617e976ad5f6ba6c419e695cd493834f1 | monthly_schema.md | Monthly Schema |
-| 09b3fd40643f2554bb6c287af37352aec448bd40ff0c21e9548e445d6c166b19 | monthly_system.md | Monthly System |
-| 653b4d6571fbd70214fe64dd23779095e7f74536e909890dba0bec070ecb7cf6 | planned_spending_table.md | Planned Spending Table |
-| 6da9c15e47f7a7e451a61f4963de08804cff254f94f663d781491790b04c20a5 | recurring_bills_table.md | Recurring Bills Table |
-| 103b961b3e9b448c2e2b190066f822596d5532719dca7d270e8deb52f0d6d4d5 | reserves_table.md | Reserves Table |
-| a313827c40ff1e1c1a2a37669db8a36b318b579e20aeb9f7e86a681951262aa4 | schedule_table.md | Schedule Table |
+| f97a8b8987018357e243f0fdfc7146a79bb402281d4c629264bd398c3321f742 | migration_status.md | Migration Status |
+| 9588ebe37c3adb09fe69fe1ad012ee052cc04d6a968f905c50161105d7a0d92e | monthly_schema.md | Monthly Schema |
+| e7692005ebea12879a27ac520dcbd2a19cf5b8b087b4a11c69fc5abe4be86c64 | monthly_system.md | Monthly System |
+| 5704c996cc768c02eb56c77cfd37c0308968544dfb109e42d8d1f4a784d6d389 | planned_spending_table.md | Planned Spending Table |
+| 3fdbbe18fc99d773330facecc9f6e85739b3a5396bc07cd36f937af4a92e392a | recurring_bills_table.md | Recurring Bills Table |
+| 5c617b044342f2864b4073507602a4f835df33c04784bac28144a48d9fac8000 | receipt_code_glossary.md | Receipt Code Glossary |
+| e8ed1ebfd4e4ecebbd263bec12133f87aae649fb4bf4b545abd815c822d15dac | reserves_table.md | Reserves Table |
+| 9cca483a69df5ee8232f37bcfdb7038b0c32efe0ba47d0341f36578535217f4d | schedule_table.md | Schedule Table |
 | efafbbf4160dffa773828dfad65cc3c01534f29c3c7dd4afbb2b344b025d43f0 | setup_budget_cells.md | Setup Budget Cells |
 | ea067971d627f17f93fbf2cfbb8b0a3e71d3e1c5074ad81c2e705dd0bc329667 | setup_schema.md | Setup Schema |
 | d925fa394df71ed86979d7f2e0a705ba3d82769a9d58002ed06141f040b4f75c | setup_system.md | Setup System |
-| 8d007dc9f4c41f925f910f2ebca134286b7183b39341d390db79ff6b9874e39a | system.md | System |
+| 55dde417dc642caa5dcc3fe61a0d4cac62793d216132a9711e695646ab49d918 | system.md | System |
 
 # Per-file loading procedure
 
@@ -227,11 +229,15 @@ Canvas name: Migration Status
 
 Verification question:
 
-What is the final listed next step in migration_status.md?
+What is the migration status?
 
 Expected answer type:
 
-Quote the final bullet under the next-steps section exactly.
+Quote the status sentence exactly.
+
+Expected answer:
+
+Migration is complete.
 
 ## monthly_schema.md
 
@@ -239,11 +245,15 @@ Canvas name: Monthly Schema
 
 Verification question:
 
-What is the final glossary entry in monthly_schema.md?
+What values may the Schedule Payday field contain?
 
 Expected answer type:
 
-Quote the final glossary entry exactly.
+Quote the allowed values exactly.
+
+Expected answer:
+
+TRUE, FALSE, or UNKNOWN
 
 ## monthly_system.md
 
@@ -251,11 +261,16 @@ Canvas name: Monthly System
 
 Verification question:
 
-What is the final semantic validation rule in monthly_system.md?
+What are the two high-level rule sections in monthly_system.md?
 
 Expected answer type:
 
-Quote the final bullet under semantic validation rules exactly.
+List the two section headings exactly.
+
+Expected answer:
+
+- Behavioral Rules
+- Human Notes
 
 ## planned_spending_table.md
 
@@ -281,6 +296,22 @@ Expected answer type:
 
 Quote the item name exactly.
 
+## receipt_code_glossary.md
+
+Canvas name: Receipt Code Glossary
+
+Verification question:
+
+What does RB CRH 26.7 mean?
+
+Expected answer type:
+
+Quote the meaning exactly.
+
+Expected answer:
+
+Raisin Bran Crunch
+
 ## reserves_table.md
 
 Canvas name: Reserves Table
@@ -299,11 +330,15 @@ Canvas name: Schedule Table
 
 Verification question:
 
-What is the Domain and Item of the final schedule row?
+What are the Month, Day, and Payday values for Regular paycheck?
 
 Expected answer type:
 
-Quote both values exactly.
+Quote the three values exactly.
+
+Expected answer:
+
+FALSE, FALSE, TRUE
 
 ## setup_budget_cells.md
 
@@ -347,11 +382,15 @@ Canvas name: System
 
 Verification question:
 
-What is the final data type listed in system.md?
+What fields must be printed for each receipt item during receipt analysis?
 
 Expected answer type:
 
-Quote the final data type definition exactly.
+List the fields exactly as described.
+
+Expected answer:
+
+The code or item text as it appears on the receipt, what the item appears to be, the proposed budget category, and the price.
 
 # Final verification report
 
